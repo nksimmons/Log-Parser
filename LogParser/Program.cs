@@ -1,15 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.IO;
 
 namespace LogParser
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        const string LogPath = "c:/access.log";
+
+        static void Main()
         {
+            var logEntries = GetLogEntries(LogPath);
+        }
+
+        static IEnumerable<string> GetLogEntries(string logPath)
+        {
+            var logEntries = new List<string>();
+
+            using (var streamReader = new StreamReader(logPath))
+            {
+                string logEntry;
+
+                while ((logEntry = streamReader.ReadLine()) != null)
+                {
+                    logEntries.Add(logEntry);
+                }
+            }
+
+            return logEntries;
         }
     }
 }
