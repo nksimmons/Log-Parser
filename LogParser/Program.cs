@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using LogParser.Models;
 
 namespace LogParser
@@ -16,9 +17,25 @@ namespace LogParser
             var logEntries = GetLogEntries(LogPath);
 
             var clientRequests = GetClientRequests(logEntries);
+
+            var culledListOfClientRequests = clientRequests
+                .Where(x => x.RequestType == "GET" && !x.IpAddress.ToString().StartsWith("207.114", StringComparison.Ordinal) && x.PortNumber == 80)
+                .GroupBy(y => y.IpAddress)
+                .Select(z => z.ToList())
+                .ToList()
+                .OrderBy(x => x.Count)
+                .Reverse()
+                .ToList();
+
+            var reportVmList = culledListOfClientRequests.Select(culledClientRequest => new ReportVM
+            {
+                Count = culledClientRequest.Count,
+                IpAddress = culledClientRequest.Select(x => x.IpAddress).FirstOrDefault()
+
+            }).ToList();
         }
 
-        static IEnumerable<ClientRequest> GetClientRequests(IEnumerable<string> logEntries)
+        static List<ClientRequest> GetClientRequests(List<string> logEntries)
         {
             return logEntries.Select(logEntry => logEntry.Split(' ').ToArray()).Select(logEntryArray => new ClientRequest
             {
@@ -29,7 +46,7 @@ namespace LogParser
             }).ToList();
         }
 
-        static IEnumerable<string> GetLogEntries(string logPath)
+        static List<string> GetLogEntries(string logPath)
         {
             var logEntries = new List<string>();
 

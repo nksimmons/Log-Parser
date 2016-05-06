@@ -44,8 +44,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\ClientRequest.cs" />
+    <Compile Include="Models\ReportVM.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\IpComparer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
