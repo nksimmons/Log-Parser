@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using LogParser.Models;
 
 namespace LogParser
 {
     internal class Program
     {
-        const string LogPath = "c:/access.log";
+        const string LogPath = "d:\\access.log";
+        const string ReportPath = "d:\\report.txt";
 
         static void Main()
         {
@@ -18,7 +19,55 @@ namespace LogParser
 
             var clientRequests = GetClientRequests(logEntries);
 
-            var culledListOfClientRequests = clientRequests
+            var culledListOfClientRequests = GetCulledListOfClientRequests(clientRequests);
+
+            var reportVmList = GetReportVmList(culledListOfClientRequests);
+
+            WriteReportToFile(reportVmList);
+        }
+
+        private static void WriteReportToFile(IEnumerable<ReportVM> reportVmList)
+        {
+            using (var writer = new StreamWriter(ReportPath))
+            {
+                foreach (var report in reportVmList)
+                {
+                    var sb = new StringBuilder();
+
+                    sb.Append(report.Count)
+                        .Append(", ")
+                        .Append('"')
+                        .Append(report.IpAddress)
+                        .Append('"')
+                        .Append(Environment.NewLine);
+
+                    writer.Write(sb);
+                }
+            }
+        }
+
+        private static IEnumerable<ReportVM> GetReportVmList(IEnumerable<List<ClientRequest>> culledListOfClientRequests)
+        {
+            var reportVmList = culledListOfClientRequests.Select(culledClientRequest => new ReportVM
+            {
+                Count = culledClientRequest.Count,
+                IpAddress = culledClientRequest.Select(x => x.IpAddress).FirstOrDefault()
+
+            }).ToList()
+                .OrderBy(x => x.Count)
+                .ThenBy(x => Convert.ToInt16(x.IpAddress.ToString().Split('.')[0]))
+                .ThenBy(x => Convert.ToInt16(x.IpAddress.ToString().Split('.')[1]))
+                .ThenBy(x => Convert.ToInt16(x.IpAddress.ToString().Split('.')[2]))
+                .ThenBy(x => Convert.ToInt16(x.IpAddress.ToString().Split('.')[3]))
+                .Reverse()
+                .ToList();
+
+            return reportVmList;
+        }
+
+        private static IEnumerable<List<ClientRequest>> GetCulledListOfClientRequests(IEnumerable<ClientRequest> clientRequests)
+        {
+            return clientRequests
                 .Where(x => x.RequestType == "GET" && !x.IpAddress.ToString().StartsWith("207.114", StringComparison.Ordinal) && x.PortNumber == 80)
                 .GroupBy(y => y.IpAddress)
                 .Select(z => z.ToList())
@@ -26,16 +75,9 @@ namespace LogParser
                 .OrderBy(x => x.Count)
                 .Reverse()
                 .ToList();
-
-            var reportVmList = culledListOfClientRequests.Select(culledClientRequest => new ReportVM
-            {
-                Count = culledClientRequest.Count,
-                IpAddress = culledClientRequest.Select(x => x.IpAddress).FirstOrDefault()
-
-            }).ToList();
         }
 
-        static List<ClientRequest> GetClientRequests(List<string> logEntries)
+        private static IEnumerable<ClientRequest> GetClientRequests(IEnumerable<string> logEntries)
         {
             return logEntries.Select(logEntry => logEntry.Split(' ').ToArray()).Select(logEntryArray => new ClientRequest
             {
@@ -46,7 +88,7 @@ namespace LogParser
             }).ToList();
         }
 
-        static List<string> GetLogEntries(string logPath)
+        private static IEnumerable<string> GetLogEntries(string logPath)
         {
             var logEntries = new List<string>();
 
@@ -56,7 +98,7 @@ namespace LogParser
 
                 while ((logEntry = streamReader.ReadLine()) != null)
                 {
-                    if (!logEntry.StartsWith("#", System.StringComparison.Ordinal) && !logEntry.Contains("Periodic-Log"))
+                    if (!logEntry.StartsWith("#", StringComparison.Ordinal) && !logEntry.Contains("Periodic-Log"))
                     {
                         logEntries.Add(logEntry);
                     }
@@ -67,7 +109,7 @@ namespace LogParser
             return logEntries;
         }
 
-        static IPAddress GetIpAddress(string ipString)
+        private static IPAddress GetIpAddress(string ipString)
         {
             return IPAddress.Parse(ipString);
         }
