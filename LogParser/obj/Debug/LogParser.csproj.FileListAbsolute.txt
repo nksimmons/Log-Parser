@@ -4,3 +4,9 @@ D:\PersonalDev\Dev\LogParser\LogParser\bin\Debug\LogParser.pdb
 D:\PersonalDev\Dev\LogParser\LogParser\obj\Debug\LogParser.csprojResolveAssemblyReference.cache
 D:\PersonalDev\Dev\LogParser\LogParser\obj\Debug\LogParser.exe
 D:\PersonalDev\Dev\LogParser\LogParser\obj\Debug\LogParser.pdb
+D:\PersonalDev\LogParser\LogParser\bin\Debug\LogParser.exe.config
+D:\PersonalDev\LogParser\LogParser\bin\Debug\LogParser.exe
+D:\PersonalDev\LogParser\LogParser\bin\Debug\LogParser.pdb
+D:\PersonalDev\LogParser\LogParser\obj\Debug\LogParser.csprojResolveAssemblyReference.cache
+D:\PersonalDev\LogParser\LogParser\obj\Debug\LogParser.exe
+D:\PersonalDev\LogParser\LogParser\obj\Debug\LogParser.pdb

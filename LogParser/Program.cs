@@ -10,10 +10,10 @@ namespace LogParser
 {
     internal class Program
     {
-        const string LogPath = "d:\\access.log";
-        const string ReportPath = "d:\\report.txt";
+        private const string LogPath = @"Log\accesslog.txt";
+        private const string ReportPath = @"d:\report.txt";
 
-        static void Main()
+        private static void Main()
         {
             var logEntries = GetLogEntries(LogPath);
 
