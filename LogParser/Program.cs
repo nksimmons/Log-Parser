@@ -10,7 +10,7 @@ namespace LogParser
 {
     internal class Program
     {
-        private const string LogPath = @"Log\accesslog.txt";
+        private const string LogPath = @"..\..\Log\accesslog.txt";
         private const string ReportPath = @"d:\report.txt";
 
         private static void Main()
